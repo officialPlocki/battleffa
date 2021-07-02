@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="BattleAPI">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../battleapi/out/artifacts/BattleAPI/BattleAPI.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
