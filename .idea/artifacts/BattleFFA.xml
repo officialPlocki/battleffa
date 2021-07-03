@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="BattleFFA">
+    <output-path>$PROJECT_DIR$/out/artifacts/BattleFFA</output-path>
+    <root id="archive" name="BattleFFA.jar">
+      <element id="module-output" name="FFASrc" />
+    </root>
+  </artifact>
+</component>

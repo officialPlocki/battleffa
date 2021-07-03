@@ -5,15 +5,11 @@ import de.battlesucht.api.utils.server.global.BitsAPI;
 import de.battlesucht.battleffa.utils.InventoryHandler;
 import java.util.HashMap;
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_8_R3.IChatBaseComponent;
-import net.minecraft.server.v1_8_R3.Packet;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_8_R3.PlayerConnection;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -30,7 +26,6 @@ public class BattleFFA extends JavaPlugin {
         plugin = (Plugin)this;
         update(plugin);
         Bukkit.getPluginManager().registerEvents((Listener)new InventoryHandler(), (Plugin)this);
-        Bukkit.getWorld("world").setDifficulty(Difficulty.PEACEFUL);
     }
 
     public void onDisable() {}
@@ -42,10 +37,7 @@ public class BattleFFA extends JavaPlugin {
                 Bukkit.getWorld("world").setThunderDuration(0);
                 Bukkit.getWorld("world").setThundering(false);
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    PlayerConnection con = (((CraftPlayer)p).getHandle()).playerConnection;
-                    IChatBaseComponent chat = IChatBaseComponent.ChatSerializer.a("{\"text\": \""+ Language.prefix +"§cTeams verboten!\"}");
-                    PacketPlayOutChat packet = new PacketPlayOutChat(chat, (byte)2);
-                    con.sendPacket((Packet)packet);
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Language.prefix +"§cTeams verboten!"));
                     if (p.getLocation().getY() <= 43.0D) {
                         if (p.getInventory().contains(Material.CHEST))
                             InventoryHandler.setInventory(p, "down");
@@ -74,7 +66,7 @@ public class BattleFFA extends JavaPlugin {
         obj.setDisplayName("§8»§b§lBATTLE§5§lSUCHT§8«");
         obj.getScore("§5").setScore(12);
         obj.getScore("§8» §5Profil").setScore(11);
-        obj.getScore("§e» " + p.getName()).setScore(10);
+        obj.getScore("§7● " + p.getName()).setScore(10);
         obj.getScore("§1").setScore(9);
         obj.getScore("§8» §5Tode").setScore(8);
         obj.getScore("§2").setScore(6);
@@ -91,7 +83,7 @@ public class BattleFFA extends JavaPlugin {
         kills.setSuffix("§7"+p.getStatistic(Statistic.PLAYER_KILLS));
         kills.addEntry(ChatColor.BLACK.toString());
         Team clouds = board.registerNewTeam("bits");
-        clouds.setPrefix("§b● ");
+        clouds.setPrefix("§7● ");
         clouds.setSuffix("§7"+BitsAPI.getBits(p));
         clouds.addEntry(ChatColor.AQUA.toString());
         obj.getScore(ChatColor.AQUA.toString()).setScore(1);

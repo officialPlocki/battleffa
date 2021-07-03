@@ -38,28 +38,18 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class InventoryHandler implements Listener {
     private static HashMap<Player, Player> attacker = new HashMap<>();
 
-    private static Location loc = getLocation();
 
     private static FileBuilder fb = new FileBuilder("locations.yml");
     private static YamlConfiguration yml = fb.getYaml();
-
-    public static Location getLocation() {
-        if(yml.isSet("Spawn.world") == false) {
-            yml.set("Spawn.World", "world");
-            yml.set("Spawn.X", 0.0);
-            yml.set("Spawn.Y", 0.0);
-            yml.set("Spawn.Z", 0.0);
-            yml.set("Spawn.Yaw", (float) 0);
-            yml.set("Spawn.Pitch", (float) 0);
-            fb.save();
-        }
-        return new Location(Bukkit.getWorld(yml.getString("Spawn.World")), yml.getDouble("Spawn.X"), yml.getDouble("Spawn.Y"), yml.getDouble("Spawn.Z"), (float) yml.get("Spawn.Yaw"), (float) yml.get("Spawn.Pitch"));
+    
+    private static Location getLoc(Player p) {
+        return new Location(p.getLocation().getWorld(), (double) 8.7, (double) 38.0, (double) 8.5, (float) -89, (float) 0.3);
     }
-
+    
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         BattleFFA.setSidebar(e.getPlayer());
-        e.getPlayer().teleport(loc);
+        e.getPlayer().teleport(getLoc(e.getPlayer()));
         setInventory(e.getPlayer(), "up");
     }
 
@@ -98,7 +88,7 @@ public class InventoryHandler implements Listener {
 
     @EventHandler
     public void onPlace(final BlockPlaceEvent e) {
-        if (e.getBlock().getLocation().getBlockY() >= 43) {
+        if (e.getBlock().getLocation().getBlockY() >= 34) {
             e.setCancelled(true);
         } else {
             e.setCancelled(false);
@@ -243,10 +233,10 @@ public class InventoryHandler implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
-        if (e.getTo().getY() <= 43.0D) {
+        if (e.getTo().getY() <= 34.0D) {
             if (e.getPlayer().getInventory().contains(Material.CHEST))
                 setInventory(e.getPlayer(), "down");
-        } else if (e.getTo().getY() >= 43.0D &&
+        } else if (e.getTo().getY() >= 34.0D &&
                 e.getPlayer().getInventory().contains(Material.STICK)) {
             setInventory(e.getPlayer(), "up");
         }
@@ -254,21 +244,14 @@ public class InventoryHandler implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        e.setRespawnLocation(loc);
-        e.getRespawnLocation().setX(loc.getX());
-        e.getRespawnLocation().setY(loc.getY());
-        e.getRespawnLocation().setZ(loc.getZ());
-        e.getRespawnLocation().setWorld(loc.getWorld());
-        e.getRespawnLocation().setYaw(loc.getYaw());
-        e.getRespawnLocation().setPitch(loc.getPitch());
-        e.getRespawnLocation().setDirection(loc.getDirection());
+        e.setRespawnLocation(getLoc(e.getPlayer()));
         try {
             Thread.sleep(50L);
         } catch (InterruptedException e1) {
             e1.printStackTrace();
         }
         setInventory(e.getPlayer(), "up");
-        e.getPlayer().teleport(loc);
+        e.getPlayer().teleport(getLoc(e.getPlayer()));
     }
 
     @EventHandler
@@ -282,7 +265,7 @@ public class InventoryHandler implements Listener {
         e.getEntity().setHealth(20.0D);
         e.getEntity().getInventory().clear();
         setInventory(e.getEntity(), "up");
-        e.getEntity().teleport(loc);
+        e.getEntity().teleport(getLoc(e.getEntity()));
     }
 
     @EventHandler
@@ -290,7 +273,7 @@ public class InventoryHandler implements Listener {
         if (e.getEntityType().equals(EntityType.PLAYER)) {
             if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
                 e.setCancelled(true);
-                if (e.getEntity().getLocation().getY() <= 43.0D)
+                if (e.getEntity().getLocation().getY() <= 34.0D)
                     setInventory((Player)e.getEntity(), "down");
             }
             if (e.getEntity().getLocation().getY() <= 0.0D) {
@@ -306,10 +289,17 @@ public class InventoryHandler implements Listener {
                     ((Player)e.getEntity()).setStatistic(Statistic.DEATHS, ((Player)e.getEntity()).getStatistic(Statistic.DEATHS) + 1);
                 } else {
                     e.getEntity().sendMessage(Language.prefix +"Du bist gestorben und hast 10 Bits verloren.");
+                    BitsAPI.removeBits((Player) e.getEntity(), 10);
+                    if (BitsAPI.getBits((Player)e.getEntity()) <= 0)
+                        BitsAPI.setBits((Player)e.getEntity(), 0);
+                    ((Player)e.getEntity()).getInventory().clear();
+                    setInventory((Player)e.getEntity(), "up");
+                    e.getEntity().teleport(getLoc((Player) e.getEntity()));
+                    return;
                 }
                 ((Player)e.getEntity()).getInventory().clear();
                 setInventory((Player)e.getEntity(), "up");
-                e.getEntity().teleport(loc);
+                e.getEntity().teleport(getLoc((Player) e.getEntity()));
             }
         }
     }
@@ -318,7 +308,7 @@ public class InventoryHandler implements Listener {
     public void onDamage(EntityDamageByEntityEvent e) {
         if (e.getDamager().getType().equals(EntityType.PLAYER) &&
                 e.getEntity().getType().equals(EntityType.PLAYER)) {
-            if (e.getEntity().getLocation().getY() >= 43.0D) {
+            if (e.getEntity().getLocation().getY() >= 34.0D) {
                 e.setCancelled(true);
                 return;
             }

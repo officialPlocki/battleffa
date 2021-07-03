@@ -1,0 +1,10 @@
+name: BattleFFA
+load: STARTUP
+depend:
+  - BattleAPI
+prefix: FFA
+authors:
+  - BattleSucht-Development
+  - plocki
+main: de.battlesucht.battleffa.BattleFFA
+version: 1.0
